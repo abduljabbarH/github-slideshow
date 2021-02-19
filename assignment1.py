@@ -181,12 +181,15 @@ def traverse_grid(grid, s_coords):
         adjacent = adjacency + [current.x, current.y]
         for a in adjacent:
             a_x, a_y = a
-            adj_node = grid[a_x, a_y]
+           
 
             if a_x < 0 or a_y < 0:
                 continue
-            if a_x > grid.shape[0] or a_y > grid.shape[0]:
+            if a_x >= grid.shape[0] or a_y >= grid.shape[0]:
                 continue
+            
+            adj_node = grid[a_x, a_y]
+
             if adj_node.value == "X":
                 continue
             if adj_node.value == "S":
@@ -205,6 +208,32 @@ def traverse_grid(grid, s_coords):
             adj_node.add_to_frontier(current, fn, gn)
             heapq.heappush(q, adj_node)
 
+def write_explored_list(explored, explored_list_filename):  
+    f = open(explored_list_filename, "w")
+    f.close()
+    f = open(explored_list_filename, "a") 
+    for node in explored:
+        f.write(f"({node.x}, {node.y})\n")
+    f.close()
+
+def write_optimal_path(explored, optimal_path_filename):
+    f = open(optimal_path_filename, "w")
+    f.close()
+    f = open(optimal_path_filename, "a")
+    cost = 0
+    optimal =[]
+    e= explored[-1]
+    while 1:
+        optimal.insert(0,e)
+        if (e.parent== None):
+            break
+       
+        e = e.parent
+    
+    for node in optimal:
+       f.write(f"({node.x}, {node.y})\n")
+    f.close()
+    
 
 def pathfinding(input_filename, optimal_path_filename, explored_list_filename):
     # input_filename contains a CSV file with the input grid
@@ -224,9 +253,12 @@ def pathfinding(input_filename, optimal_path_filename, explored_list_filename):
     # print_array_grid_node(grid)
 
     e = traverse_grid(grid, s_coords)
-    print_array_node(e)
+    write_explored_list(e,explored_list_filename)
+    write_optimal_path(e,optimal_path_filename)
+    #print_array_node(e)
     print(e[-1].g_cost)
 
-
-input_filename = "Example2/input.txt"
-pathfinding(input_filename, "", "")
+explore_list_filename = "Example1/explored_list_filename.txt"
+optimal_path_filename = "Example1/optimal_path_filename.txt"
+input_filename = "Example1/input.txt"
+pathfinding(input_filename, optimal_path_filename, explore_list_filename)
